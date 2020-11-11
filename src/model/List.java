@@ -90,6 +90,9 @@ public class List<ContentType> {
      */
     public boolean isEmpty() {
         //TODO 01a: Die Liste ist leer, wenn es kein erstes Element gibt.
+        if(first == null){
+            return true;
+        }
         return false;
     }
 
@@ -101,6 +104,9 @@ public class List<ContentType> {
      */
     public boolean hasAccess() {
         //TODO 01b: Es gibt keinen Zugriff, wenn current auf kein Element verweist.
+        if(current == null){
+            return true;
+        }
         return false;
     }
 
@@ -113,6 +119,11 @@ public class List<ContentType> {
      */
     public void next() {
         //TODO 01c: Wechsel auf die nächste Node
+        if(!isEmpty() && hasAccess() && current != last){
+            current = current.getNextNode();
+        }else{
+            current = null;
+        }
     }
 
     /**
@@ -121,6 +132,9 @@ public class List<ContentType> {
      */
     public void toFirst() {
         //TODO 01d: Sprung zur ersten Node
+        if(!isEmpty()){
+            current = first;
+        }
     }
 
     /**
@@ -129,6 +143,9 @@ public class List<ContentType> {
      */
     public void toLast() {
         //TODO 01e: Sprung auf die letzte Node
+        if(!isEmpty()){
+            current = last;
+        }
     }
 
     /**
@@ -140,6 +157,9 @@ public class List<ContentType> {
      *         kein aktuelles Objekt gibt
      */
     public ContentType getContent() {
+        if(hasAccess()){
+            return current.getContentObject();
+        }
         return null;
     }
 
@@ -154,6 +174,9 @@ public class List<ContentType> {
     public void setContent(ContentType pContent) {
         // Nichts tun, wenn es keinen Inhalt oder kein aktuelles Element gibt.
         //TODO 01f: Inhaltsobjekt ersetzen
+        if(hasAccess() && pContent != null){
+            current.setContentObject(pContent);
+        }
     }
 
     /**
@@ -170,6 +193,16 @@ public class List<ContentType> {
      */
     public void insert(ContentType pContent) {
         //TODO 01g: Inhaltsobjekt einfügen
+        ListNode node = new ListNode(pContent);
+        if(pContent != null) {
+            if (hasAccess()) {
+                node.setNextNode(current);
+                getPrevious(current).setNextNode(node);
+            } else if (isEmpty()) {
+                first = node;
+                last = node;
+            }
+        }
     }
 
     /**
@@ -184,6 +217,16 @@ public class List<ContentType> {
      */
     public void append(ContentType pContent) {
         //TODO 01h: Inhaltsobjekt anhängen
+        if(pContent != null){
+            ListNode node = new ListNode(pContent);
+            if(!isEmpty()) {
+                last.setNextNode(node);
+                last = last.getNextNode();
+            }else{
+                first = node;
+                last = node;
+            }
+        }
     }
 
     /**
@@ -198,6 +241,11 @@ public class List<ContentType> {
      */
     public void concat(List<ContentType> pList) {
         //TODO 01i: eine Liste an eine andere anhängen
+        if(pList != this && pList != null && !pList.isEmpty()){
+            last.setNextNode(pList.first);
+            pList = new List<ContentType>();
+
+        }
     }
 
     /**
@@ -212,6 +260,12 @@ public class List<ContentType> {
     public void remove() {
         // Nichts tun, wenn es kein aktuelles Element gibt oder die Liste leer ist.
         //TODO 01j: eine Node samt Inhaltsobjekt entfernen
+        if(!isEmpty() && !hasAccess()){
+            if(hasAccess()){
+                getPrevious(current).setNextNode(current.getNextNode());
+                current = current.getNextNode();
+            }
+        }
     }
 
     /**
@@ -227,6 +281,16 @@ public class List<ContentType> {
      */
     private ListNode getPrevious(ListNode pNode) {
         //TODO 01k: Vorgänger-Node der aktuellen Node liefern.
+        if(!isEmpty() && pNode != null && pNode == first) {
+            ListNode node = first;
+            while(node.getNextNode() != pNode){
+                node = node.getNextNode();
+                if(node == last){
+                    return null;
+                }
+            }
+            return node;
+        }
         return null;
     }
 

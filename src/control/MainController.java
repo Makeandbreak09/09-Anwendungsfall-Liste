@@ -58,6 +58,11 @@ public class MainController {
      */
     public boolean appendANewFile(int index, String name, String phoneNumber){
         //TODO 02: Hinzufügen einer neuen Akte am Ende der Liste.
+        if(allShelves[index] != null) {
+            File file = new File(name, phoneNumber);
+            allShelves[index].append(file);
+            return true;
+        }
         return false;
     }
 
