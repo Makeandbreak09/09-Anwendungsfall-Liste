@@ -104,7 +104,7 @@ public class List<ContentType> {
      */
     public boolean hasAccess() {
         //TODO 01b: Es gibt keinen Zugriff, wenn current auf kein Element verweist.
-        if(current == null){
+        if(current != null){
             return true;
         }
         return false;
@@ -196,9 +196,9 @@ public class List<ContentType> {
         ListNode node = new ListNode(pContent);
         if(pContent != null) {
             if (hasAccess()) {
-                node.setNextNode(current);
                 getPrevious(current).setNextNode(node);
-            } else if (isEmpty()) {
+                node.setNextNode(current);
+            } else if(isEmpty()) {
                 first = node;
                 last = node;
             }
@@ -225,6 +225,7 @@ public class List<ContentType> {
             }else{
                 first = node;
                 last = node;
+                current = null;
             }
         }
     }
@@ -243,8 +244,11 @@ public class List<ContentType> {
         //TODO 01i: eine Liste an eine andere anhängen
         if(pList != this && pList != null && !pList.isEmpty()){
             last.setNextNode(pList.first);
-            pList = new List<ContentType>();
+            last = pList.last;
 
+            pList.first = null;
+            pList.last = null;
+            pList.current = null;
         }
     }
 
@@ -260,10 +264,16 @@ public class List<ContentType> {
     public void remove() {
         // Nichts tun, wenn es kein aktuelles Element gibt oder die Liste leer ist.
         //TODO 01j: eine Node samt Inhaltsobjekt entfernen
-        if(!isEmpty() && !hasAccess()){
-            if(hasAccess()){
+        if(!isEmpty() && hasAccess()){
+            if(current != first && current != last){
                 getPrevious(current).setNextNode(current.getNextNode());
                 current = current.getNextNode();
+            }else if(current == first){
+                first = first.getNextNode();
+                current = current.getNextNode();
+            }else{
+                last = getPrevious(current);
+                current = null;
             }
         }
     }
@@ -281,13 +291,10 @@ public class List<ContentType> {
      */
     private ListNode getPrevious(ListNode pNode) {
         //TODO 01k: Vorgänger-Node der aktuellen Node liefern.
-        if(!isEmpty() && pNode != null && pNode == first) {
+        if(!isEmpty() && pNode != null && pNode != first) {
             ListNode node = first;
-            while(node.getNextNode() != pNode){
+            while(node != null && node.getNextNode() != pNode){
                 node = node.getNextNode();
-                if(node == last){
-                    return null;
-                }
             }
             return node;
         }
