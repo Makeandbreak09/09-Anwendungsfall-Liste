@@ -47,6 +47,20 @@ public class MainController {
      */
     public boolean sort(int index){
         //TODO 07: Sortieren einer Liste.
+        int count = 0;
+        allShelves[index].toFirst();
+        while(allShelves[index].hasAccess()){
+            count++;
+            allShelves[index].next();
+        }
+
+        for(int i = 0; i<count; i++){
+            allShelves[index].toFirst();
+            for (int j = 0; j<i; j++){
+                allShelves[index].next();
+            }
+        }
+
         return false;
     }
 
@@ -91,7 +105,7 @@ public class MainController {
      */
     public boolean insertANewFile(int index, String name, String phoneNumber){
         //TODO 08: Einfügen einer neuen Akte an die richtige Stelle innerhalb der Liste.
-        if(allShelves[index] != null) {
+        if(allShelves[index] != null && allShelves[index].hasAccess()) {
             File file = new File(name, phoneNumber);
             allShelves[index].insert(file);
             return true;

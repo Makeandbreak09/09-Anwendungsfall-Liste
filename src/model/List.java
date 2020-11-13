@@ -193,12 +193,16 @@ public class List<ContentType> {
      */
     public void insert(ContentType pContent) {
         //TODO 01g: Inhaltsobjekt einfügen
-        ListNode node = new ListNode(pContent);
         if(pContent != null) {
-            if (hasAccess()) {
-                getPrevious(current).setNextNode(node);
+            ListNode node = new ListNode(pContent);
+            if(hasAccess()) {
+                if (current == first) {
+                    first = node;
+                } else {
+                    getPrevious(current).setNextNode(node);
+                }
                 node.setNextNode(current);
-            } else if(isEmpty()) {
+            }else if(isEmpty()){
                 first = node;
                 last = node;
             }
@@ -243,7 +247,11 @@ public class List<ContentType> {
     public void concat(List<ContentType> pList) {
         //TODO 01i: eine Liste an eine andere anhängen
         if(pList != this && pList != null && !pList.isEmpty()){
-            last.setNextNode(pList.first);
+            if(!isEmpty()) {
+                last.setNextNode(pList.first);
+            }else{
+                first = pList.first;
+            }
             last = pList.last;
 
             pList.first = null;
@@ -268,11 +276,16 @@ public class List<ContentType> {
             if(current != first && current != last){
                 getPrevious(current).setNextNode(current.getNextNode());
                 current = current.getNextNode();
-            }else if(current == first){
+            }else if(current == first && current != last){
                 first = first.getNextNode();
                 current = current.getNextNode();
+            }else if(current != first && current == last){
+                last = getPrevious(last);
+                last.setNextNode(null);
+                current = null;
             }else{
-                last = getPrevious(current);
+                first = null;
+                last = null;
                 current = null;
             }
         }
