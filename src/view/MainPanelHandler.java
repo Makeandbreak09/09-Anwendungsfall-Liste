@@ -34,6 +34,8 @@ public class MainPanelHandler {
         this.controller = controller;
         createButtons();
         createShelfs();
+        handleInsertButtons(0, false);
+        handleInsertButtons(1, false);
     }
 
     private void createButtons(){
