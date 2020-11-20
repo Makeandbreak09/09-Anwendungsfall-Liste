@@ -2,6 +2,12 @@ package control;
 
 import model.File;
 import model.List;
+import sun.net.URLCanonicalizer;
+
+import javax.swing.text.Document;
+import java.awt.*;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by Jean-Pierre on 05.11.2016.
@@ -33,7 +39,7 @@ public class MainController {
 
         String[] output = new String[count];
         allShelves[index].toFirst();
-        for(int i = 0; i < output.length; i++){
+        for(int i = 0; i < output.length; i++) {
             output[i] = allShelves[index].getContent().getName();
             allShelves[index].next();
         }
@@ -66,7 +72,7 @@ public class MainController {
                         string = allShelves[index].getContent().getName();
                         content = allShelves[index].getContent();
                     }
-                    if (j>i && allShelves[index].getContent().getName().compareTo(string) < 0) {
+                    if (j>i && allShelves[index].getContent().getName().compareToIgnoreCase(string) < 0) {
                         string = allShelves[index].getContent().getName();
                         content = allShelves[index].getContent();
                         inde = j;
@@ -190,6 +196,27 @@ public class MainController {
         if(allShelves[shelfIndex].hasAccess()) {
             String[] output = new String[]{allShelves[shelfIndex].getContent().getName(), allShelves[shelfIndex].getContent().getPhoneNumber()};
             allShelves[shelfIndex].remove();
+            return output;
+        }
+        return new String[]{"Nicht vorhanden","Nicht vorhanden"};
+    }
+
+    public String[] search(int shelfIndex, int fileIndex){
+        //TODO 06: Entfernen aus einer Liste.
+        allShelves[shelfIndex].toFirst();
+        for(int i = 0; i<fileIndex && allShelves[shelfIndex].hasAccess(); i++) {
+            allShelves[shelfIndex].next();
+        }
+        if(allShelves[shelfIndex].hasAccess()) {
+            String[] output = new String[]{allShelves[shelfIndex].getContent().getName(), allShelves[shelfIndex].getContent().getPhoneNumber()};
+
+            
+            try {
+                Desktop.getDesktop().browse("https://www.google.com/search?q="+allShelves[shelfIndex].getContent().getName());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             return output;
         }
         return new String[]{"Nicht vorhanden","Nicht vorhanden"};

@@ -28,6 +28,7 @@ public class MainPanelHandler {
     private JButton insertButton02;
     private JButton searchButton;
     private JButton removeButton;
+    private JButton suchImInternetButton;
     private MainController controller;
 
     public MainPanelHandler(MainController controller){
@@ -93,6 +94,12 @@ public class MainPanelHandler {
                 removeSelectedFile();
             }
         });
+        suchImInternetButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                surchSelectedFile();
+            }
+        });
     }
 
     private void createShelfs(){
@@ -121,8 +128,13 @@ public class MainPanelHandler {
         DefaultListModel listModel = new DefaultListModel();
 
         String[] output = controller.showShelfContent(shelfIndex);
-        for(int i = 0; i < output.length; i++){
-            String outputText = "Aktenindex: " + i + "\n Familie: " + output[i];
+        if(output.length > 0) {
+            for (int i = 0; i < output.length; i++) {
+                String outputText = "Aktenindex: " + i + "\n Familie: " + output[i];
+                listModel.addElement(outputText);
+            }
+        }else{
+            String outputText = "Nix drin.";
             listModel.addElement(outputText);
         }
 
@@ -201,7 +213,18 @@ public class MainPanelHandler {
             addTextToOutput("Es wurde aus dem Regal 2 die Akte mit dem Index "+shelf02.getSelectedIndex()+" entfernt. Familie "+info[0]+", Telefonnummer: "+info[1]);
             update(1);
         }
+    }
 
+    private void surchSelectedFile(){
+        if(!shelf01.isSelectionEmpty()){
+            String[] info = controller.search(0,shelf01.getSelectedIndex());
+            addTextToOutput("Es wurde aus dem Regal 1 die Akte mit dem Index "+shelf01.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
+            update(0);
+        }else if(!shelf02.isSelectionEmpty()){
+            String[] info = controller.search(1,shelf02.getSelectedIndex());
+            addTextToOutput("Es wurde aus dem Regal 2 die Akte mit dem Index "+shelf02.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
+            update(1);
+        }
     }
 
     public JPanel getPanel(){
