@@ -7,6 +7,8 @@ import sun.net.URLCanonicalizer;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -201,7 +203,7 @@ public class MainController {
         return new String[]{"Nicht vorhanden","Nicht vorhanden"};
     }
 
-    public String[] search(int shelfIndex, int fileIndex){
+    public String[] search(int shelfIndex, int fileIndex, int website){
         //TODO 06: Entfernen aus einer Liste.
         allShelves[shelfIndex].toFirst();
         for(int i = 0; i<fileIndex && allShelves[shelfIndex].hasAccess(); i++) {
@@ -209,17 +211,49 @@ public class MainController {
         }
         if(allShelves[shelfIndex].hasAccess()) {
             String[] output = new String[]{allShelves[shelfIndex].getContent().getName(), allShelves[shelfIndex].getContent().getPhoneNumber()};
+            String searchString = allShelves[shelfIndex].getContent().getName().replace(" ", "+");
 
-            
-            try {
-                Desktop.getDesktop().browse("https://www.google.com/search?q="+allShelves[shelfIndex].getContent().getName());
-            } catch (IOException e) {
-                e.printStackTrace();
+            switch (website) {
+                case 0:
+                    try {
+                        URI domain = new URI("https://www.google.com/search?q=" + searchString);
+                        Desktop.getDesktop().browse(domain);
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 1:
+                    try {
+                        URI domain = new URI("https://de.wikipedia.org/w/index.php?search=" + searchString);
+                        Desktop.getDesktop().browse(domain);
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
+                    try {
+                        URI domain = new URI("https://www.google.com/search?q=" + searchString);
+                        Desktop.getDesktop().browse(domain);
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
 
             return output;
         }
         return new String[]{"Nicht vorhanden","Nicht vorhanden"};
+    }
+
+    public File getSelectedFile(int shelfIndex, int fileIndex){
+        allShelves[shelfIndex].toFirst();
+        for(int i = 0; i<fileIndex && allShelves[shelfIndex].hasAccess(); i++) {
+            allShelves[shelfIndex].next();
+        }
+        if(allShelves[shelfIndex].hasAccess()) {
+            return allShelves[shelfIndex].getContent();
+        }
+        return null;
     }
 
     /**
@@ -244,4 +278,5 @@ public class MainController {
             appendANewFile(shelfIndex,name,phone);
         }
     }
+
 }

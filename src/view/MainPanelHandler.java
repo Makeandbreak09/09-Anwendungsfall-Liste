@@ -1,12 +1,15 @@
 package view;
 
 import control.MainController;
+import model.File;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 /**
  * Created by Jean-Pierre on 05.11.2016.
@@ -29,6 +32,9 @@ public class MainPanelHandler {
     private JButton searchButton;
     private JButton removeButton;
     private JButton suchImInternetButton;
+    private JComboBox comboBox1;
+    private JTextField editNameField;
+    private JTextField editNumberField;
     private MainController controller;
 
     public MainPanelHandler(MainController controller){
@@ -121,6 +127,28 @@ public class MainPanelHandler {
         for(int i = 0; i < allShelfs.length; i++){
             update(i);
         }
+        shelf01.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                updateEditField(controller.getSelectedFile(0, shelf01.getSelectedIndex()));
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+
+            }
+        });
+        shelf02.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent focusEvent) {
+                updateEditField(controller.getSelectedFile(1, shelf02.getSelectedIndex()));
+            }
+
+            @Override
+            public void focusLost(FocusEvent focusEvent) {
+
+            }
+        });
     }
 
     private void update(int shelfIndex){
@@ -217,13 +245,25 @@ public class MainPanelHandler {
 
     private void surchSelectedFile(){
         if(!shelf01.isSelectionEmpty()){
-            String[] info = controller.search(0,shelf01.getSelectedIndex());
+            String[] info = controller.search(0,shelf01.getSelectedIndex(), comboBox1.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 1 die Akte mit dem Index "+shelf01.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
             update(0);
         }else if(!shelf02.isSelectionEmpty()){
-            String[] info = controller.search(1,shelf02.getSelectedIndex());
+            String[] info = controller.search(1,shelf02.getSelectedIndex(), comboBox1.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 2 die Akte mit dem Index "+shelf02.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
             update(1);
+        }else{
+            addTextToOutput("Bitte wählen sie einen Namen zum Suchen aus.");
+        }
+    }
+
+    private void updateEditField(File file){
+        if(file != null) {
+            editNameField.setText(file.getName());
+            editNumberField.setText(file.getPhoneNumber());
+        }else{
+            editNameField.disable();
+            editNumberField.disable();
         }
     }
 
