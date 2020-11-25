@@ -75,9 +75,9 @@ public class MainController {
                         content = allShelves[index].getContent();
                     }
                     if (j>i && allShelves[index].getContent().getName().compareToIgnoreCase(string) < 0) {
+                        inde = j;
                         string = allShelves[index].getContent().getName();
                         content = allShelves[index].getContent();
-                        inde = j;
                     }
                     allShelves[index].next();
                 }
@@ -246,12 +246,14 @@ public class MainController {
     }
 
     public File getSelectedFile(int shelfIndex, int fileIndex){
-        allShelves[shelfIndex].toFirst();
-        for(int i = 0; i<fileIndex && allShelves[shelfIndex].hasAccess(); i++) {
-            allShelves[shelfIndex].next();
-        }
-        if(allShelves[shelfIndex].hasAccess()) {
-            return allShelves[shelfIndex].getContent();
+        if(fileIndex >= 0) {
+            allShelves[shelfIndex].toFirst();
+            for (int i = 0; i < fileIndex && allShelves[shelfIndex].hasAccess(); i++) {
+                allShelves[shelfIndex].next();
+            }
+            if (allShelves[shelfIndex].hasAccess()) {
+                return allShelves[shelfIndex].getContent();
+            }
         }
         return null;
     }

@@ -6,10 +6,7 @@ import model.File;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 
 /**
  * Created by Jean-Pierre on 05.11.2016.
@@ -37,12 +34,17 @@ public class MainPanelHandler {
     private JTextField editNumberField;
     private MainController controller;
 
+    private int shelfInd, listInd;
+
     public MainPanelHandler(MainController controller){
         this.controller = controller;
         createButtons();
         createShelfs();
+        createFields();
         handleInsertButtons(0, false);
         handleInsertButtons(1, false);
+        editNameField.addKeyListener(new KeyAdapter() {
+        });
     }
 
     private void createButtons(){
@@ -125,33 +127,57 @@ public class MainPanelHandler {
             }
         });
         for(int i = 0; i < allShelfs.length; i++){
-            update(i);
+            update(i, true);
         }
-        shelf01.addFocusListener(new FocusListener() {
+        shelf01.addMouseListener(new MouseAdapter() {
             @Override
-            public void focusGained(FocusEvent focusEvent) {
+            public void mouseClicked(MouseEvent mouseEvent) {
+                super.mouseClicked(mouseEvent);
                 updateEditField(controller.getSelectedFile(0, shelf01.getSelectedIndex()));
-            }
-
-            @Override
-            public void focusLost(FocusEvent focusEvent) {
-
+                shelfInd = 0;
+                listInd = shelf01.getSelectedIndex();
             }
         });
-        shelf02.addFocusListener(new FocusListener() {
+        shelf02.addMouseListener(new MouseAdapter() {
             @Override
-            public void focusGained(FocusEvent focusEvent) {
+            public void mouseClicked(MouseEvent mouseEvent) {
+                super.mouseClicked(mouseEvent);
                 updateEditField(controller.getSelectedFile(1, shelf02.getSelectedIndex()));
-            }
-
-            @Override
-            public void focusLost(FocusEvent focusEvent) {
-
+                shelfInd = 1;
+                listInd = shelf02.getSelectedIndex();
             }
         });
     }
 
-    private void update(int shelfIndex){
+    private void createFields(){
+        editNameField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                super.keyTyped(keyEvent);
+                if(shelfInd == 0) {
+                    controller.getSelectedFile(0, listInd).setName(editNameField.getText());
+                }else if(shelfInd == 1){
+                    controller.getSelectedFile(1, listInd).setName(editNameField.getText());
+                }
+                update(shelfInd, false);
+            }
+        });
+
+        editNumberField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent keyEvent) {
+                super.keyTyped(keyEvent);
+                if(shelfInd == 0) {
+                    controller.getSelectedFile(0, listInd).setPhoneNumber(editNumberField.getText());
+                }else if(shelfInd == 1){
+                    controller.getSelectedFile(1, listInd).setPhoneNumber(editNumberField.getText());
+                }
+                update(shelfInd, false);
+            }
+        });
+    }
+
+    private void update(int shelfIndex, boolean clearSel){
         //Aktualisierung des gewählten Regals
         DefaultListModel listModel = new DefaultListModel();
 
@@ -167,9 +193,13 @@ public class MainPanelHandler {
         }
 
         allShelfs[shelfIndex].setModel(listModel);
-        for(int i = 0; i < allShelfs.length; i++){
-            allShelfs[i].clearSelection();
+        if(clearSel) {
+            for (int i = 0; i < allShelfs.length; i++) {
+                allShelfs[i].clearSelection();
+                updateEditField(null);
+            }
         }
+
     }
 
     private void handleInsertButtons(int shelfIndex, boolean b){
@@ -182,7 +212,7 @@ public class MainPanelHandler {
 
     private void sortAShelf(int shelfIndex){
         if(controller.sort(shelfIndex)){
-            update(shelfIndex);
+            update(shelfIndex, true);
             handleInsertButtons(shelfIndex, true);
             addTextToOutput("Es wurde das Regal "+shelfIndex+" sortiert.");
         }else{
@@ -196,8 +226,8 @@ public class MainPanelHandler {
         }else{
             addTextToOutput("Es konnten keine Akten verschoben werden.");
         }
-        update(fromShelf);
-        update(toShelf);
+        update(fromShelf, true);
+        update(toShelf, true);
         handleInsertButtons(fromShelf, false);
         handleInsertButtons(toShelf, false);
     }
@@ -205,7 +235,7 @@ public class MainPanelHandler {
     private void appendANewFileTo(int shelfIndex){
         if(controller.appendANewFile(shelfIndex, nameTextField.getText(), phoneNrTextField.getText())){
             addTextToOutput("Es wurde eine Akte für die Familie " + nameTextField.getText() + " angelegt und hinzugefügt.");
-            update(shelfIndex);
+            update(shelfIndex, true);
             handleInsertButtons(shelfIndex, false);
         }else{
             addTextToOutput("Es konnte keine neue Akte angelegt und hinzugefügt werden.");
@@ -218,7 +248,7 @@ public class MainPanelHandler {
         }else{
             addTextToOutput("Das Einfügen einer neuen Akte ist gescheitert.");
         }
-        update(shelfIndex);
+        update(shelfIndex, true);
     }
 
     private void searchForFile(){
@@ -235,11 +265,11 @@ public class MainPanelHandler {
         if(!shelf01.isSelectionEmpty()){
             String[] info = controller.remove(0,shelf01.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 1 die Akte mit dem Index "+shelf01.getSelectedIndex()+" entfernt. Familie "+info[0]+", Telefonnummer: "+info[1]);
-            update(0);
+            update(0, true);
         }else if(!shelf02.isSelectionEmpty()){
             String[] info = controller.remove(1,shelf02.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 2 die Akte mit dem Index "+shelf02.getSelectedIndex()+" entfernt. Familie "+info[0]+", Telefonnummer: "+info[1]);
-            update(1);
+            update(1, true);
         }
     }
 
@@ -247,11 +277,11 @@ public class MainPanelHandler {
         if(!shelf01.isSelectionEmpty()){
             String[] info = controller.search(0,shelf01.getSelectedIndex(), comboBox1.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 1 die Akte mit dem Index "+shelf01.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
-            update(0);
+            update(0, true);
         }else if(!shelf02.isSelectionEmpty()){
             String[] info = controller.search(1,shelf02.getSelectedIndex(), comboBox1.getSelectedIndex());
             addTextToOutput("Es wurde aus dem Regal 2 die Akte mit dem Index "+shelf02.getSelectedIndex()+" im Internet gesucht. Familie "+info[0]+", Telefonnummer: "+info[1]);
-            update(1);
+            update(1, true);
         }else{
             addTextToOutput("Bitte wählen sie einen Namen zum Suchen aus.");
         }
@@ -261,7 +291,11 @@ public class MainPanelHandler {
         if(file != null) {
             editNameField.setText(file.getName());
             editNumberField.setText(file.getPhoneNumber());
+            editNameField.enable();
+            editNumberField.enable();
         }else{
+            editNameField.setText("");
+            editNumberField.setText("");
             editNameField.disable();
             editNumberField.disable();
         }
