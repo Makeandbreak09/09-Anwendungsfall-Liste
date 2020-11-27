@@ -139,23 +139,15 @@ public class MainController {
     public boolean insertANewFile(int index, String name, String phoneNumber){
         //TODO 08: Einfügen einer neuen Akte an die richtige Stelle innerhalb der Liste.
         if(allShelves[index] != null && !name.equals("") && !phoneNumber.equals("")) {
-            int count = 0;
+            File file = new File(name, phoneNumber);
             allShelves[index].toFirst();
-            while (allShelves[index].hasAccess()) {
-                count++;
-                allShelves[index].next();
-            }
-
-            allShelves[index].toFirst();
-            for(int i = 0; i<count; i++){
-                if(allShelves[index].getContent().getName().compareTo(name) > 0){
-                    File file = new File(name, phoneNumber);
+            while(allShelves[index].hasAccess()){
+                if(allShelves[index].getContent().getName().compareToIgnoreCase(name) > 0){
                     allShelves[index].insert(file);
                     return true;
                 }
                 allShelves[index].next();
             }
-            File file = new File(name, phoneNumber);
             allShelves[index].append(file);
             return true;
         }
